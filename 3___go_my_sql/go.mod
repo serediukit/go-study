@@ -1,3 +1,5 @@
-module 3___go_my_sql
+module main
 
 go 1.23
+
+require github.com/gorilla/mux v1.8.1
