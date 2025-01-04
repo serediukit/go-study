@@ -1,3 +1,3 @@
-module p_1_restaurant_backend
+module restaurant_backend
 
 go 1.23
