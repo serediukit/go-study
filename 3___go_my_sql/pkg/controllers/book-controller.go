@@ -10,9 +10,7 @@ import (
 	"strconv"
 )
 
-var NewBook models.Book
-
-func getBook(w http.ResponseWriter, r *http.Request) {
+func GetBook(w http.ResponseWriter, _ *http.Request) {
 	newBooks := models.GetAllBooks()
 	res, _ := json.Marshal(newBooks)
 	w.Header().Set("Content-Type", "pkglication/json")
@@ -20,7 +18,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(res)
 }
 
-func getBookById(w http.ResponseWriter, r *http.Request) {
+func GetBookById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookId := vars["id"]
 	ID, err := strconv.ParseInt(bookId, 0, 0)
