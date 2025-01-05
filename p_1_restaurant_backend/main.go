@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
-	"os"
+
 	"restaurant_backend/database"
 	"restaurant_backend/middleware"
 	"restaurant_backend/routes"
+
+	"fmt"
+	"os"
 )
 
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "food")
