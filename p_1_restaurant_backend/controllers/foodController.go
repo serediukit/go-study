@@ -57,6 +57,12 @@ func GetFoods() gin.HandlerFunc {
 							{"$sum", 1},
 						},
 					},
+					{
+						"data",
+						bson.D{
+							{"$push", "$$ROOT"},
+						},
+					},
 				},
 			},
 		}
@@ -69,8 +75,14 @@ func GetFoods() gin.HandlerFunc {
 					{
 						"food_items",
 						bson.D{
-							"$slice",
-							[]interface{}{"$data", startIndex, recordPerPage},
+							{
+								"$slice",
+								[]interface{}{
+									"$data",
+									startIndex,
+									recordPerPage,
+								},
+							},
 						},
 					},
 				},
