@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"net/http"
 	"restaurant_backend/database"
 	"restaurant_backend/models"
@@ -89,9 +90,22 @@ func GetFoods() gin.HandlerFunc {
 			},
 		}
 
-		if err != nil || startIndex < 1 {
-			startIndex = 1
+		result, err := foodCollection.Aggregate(ctx, mongo.Pipeline{
+			matchStage,
+			groupStage,
+			projectStage,
+		})
+
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occurred while listing food items"})
 		}
+
+		var allFoods []bson.M
+		if err = result.All(ctx, &allFoods); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, allFoods[0])
 	}
 }
 
