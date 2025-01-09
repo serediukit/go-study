@@ -187,19 +187,26 @@ func UpdateFood() gin.HandlerFunc {
 		var updateObj primitive.D
 
 		if food.Name != nil {
-
+			updateObj = append(updateObj, bson.E{"name", food.Name})
 		}
 
 		if food.Price != nil {
-
+			updateObj = append(updateObj, bson.E{"price", food.Price})
 		}
 
 		if food.FoodImage != nil {
-
+			updateObj = append(updateObj, bson.E{"food_image", food.FoodImage})
 		}
 
 		if food.MenuID != nil {
-
+			err := menuCollection.FindOne(ctx, bson.M{"menu_id": food.MenuID}).Decode(&menu)
+			defer cancel()
+			if err != nil {
+				msg := fmt.Sprintf("message: Menu does not exist")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+				return
+			}
+			updateObj = append(updateObj, bson.E{"menu_id", food.MenuID})
 		}
 
 		food.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
