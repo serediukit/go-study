@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"math"
 	"net/http"
 	"restaurant_backend/database"
 	"restaurant_backend/models"
@@ -238,9 +239,10 @@ func UpdateFood() gin.HandlerFunc {
 }
 
 func round(num float64) int {
-	return 0
+	return int(num + math.Copysign(0.5, num))
 }
 
 func toFixed(num float64, precision int) float64 {
-	return 0
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
 }
