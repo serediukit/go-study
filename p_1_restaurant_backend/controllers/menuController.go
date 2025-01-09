@@ -131,7 +131,7 @@ func UpdateMenu() gin.HandlerFunc {
 				ctx,
 				filter,
 				bson.D{
-					{"$set": updateObj}
+					{"$set", updateObj},
 				},
 				&opt,
 			)
