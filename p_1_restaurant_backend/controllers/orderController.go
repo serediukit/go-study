@@ -55,7 +55,47 @@ func GetOrder() gin.HandlerFunc {
 
 func CreateOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var table models.Table
+		var order models.Order
 
+		if err := c.BindJSON(&order); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		validationErr := validate.Struct(order)
+
+		if validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
+		}
+
+		if order.TableID != nil {
+			err := orderCollection.FindOne(ctx, bson.M{"table_id": *order.TableID}).Decode(&table)
+			if err != nil {
+				msg := fmt.Sprintf("message: Table was not found")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+				return
+			}
+		}
+
+		order.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		order.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+
+		order.ID = primitive.NewObjectID()
+		order.OrderID = order.ID.Hex()
+
+		result, insertErr := orderCollection.InsertOne(ctx, order)
+
+		if insertErr != nil {
+			msg := fmt.Sprintf("order item was not created")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+
+		defer cancel()
+		c.JSON(http.StatusOK, result)
 	}
 }
 
