@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"restaurant_backend/database"
+	"restaurant_backend/models"
 	"time"
 )
 
@@ -34,7 +35,18 @@ func GetOrders() gin.HandlerFunc {
 
 func GetOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		orderID := c.Param("order_id")
+		var order models.Order
 
+		err := orderCollection.FindOne(ctx, bson.M{"order_id": orderID}).Decode(&order)
+		defer cancel()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occurred while fetching the order item"})
+		}
+
+		c.JSON(http.StatusOK, order)
 	}
 }
 
