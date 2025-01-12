@@ -157,6 +157,8 @@ func UpdateOrder() gin.HandlerFunc {
 }
 
 func OrderItemOrderCreator(order models.Order) string {
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
 	order.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	order.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
@@ -165,6 +167,12 @@ func OrderItemOrderCreator(order models.Order) string {
 
 	orderCollection.InsertOne(ctx, order)
 	defer cancel()
+
+	_, insertErr := orderCollection.InsertOne(ctx, order)
+
+	if insertErr != nil {
+		log.Fatal(insertErr)
+	}
 
 	return order.OrderID
 }
